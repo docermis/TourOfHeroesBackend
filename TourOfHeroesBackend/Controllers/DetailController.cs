@@ -17,6 +17,7 @@ namespace TourOfHeroesBackend.Controllers
         string database = "HeroDatabase.xml";
 
         // GET api/values
+        //Get all heroes
         [HttpGet]
         public IEnumerable<Hero> Get()
         {
@@ -41,6 +42,7 @@ namespace TourOfHeroesBackend.Controllers
         }
 
         // GET api/values/5
+        //Get hero with specific id
         [HttpGet( "{id}" )]
         public Hero Get( int id )
         {
@@ -65,6 +67,7 @@ namespace TourOfHeroesBackend.Controllers
         }
 
         // GET api/values/byName/superman
+        //Get hero with specific name
         [HttpGet( "byName/{name}" )]
         public Hero Get( string name )
         {

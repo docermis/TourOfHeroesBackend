@@ -52,34 +52,13 @@ namespace TourOfHeroesBackend.Controllers
             return heroList;
         }
         
-        [Route( "form" )]
-        [HttpPost]
-        public void UpdateXmlFile( Info fileInfo )
-        {
-            string dirPath = @"C:\Users\eioannidis\source\repos\MyDatabase\";
-            string xmlTargetPath = System.IO.Path.Combine( dirPath, fileInfo.XmlFileName );
-            XmlDocument doc = new XmlDocument();
-            doc.Load( xmlTargetPath );
-
-            XmlNode root = doc.SelectSingleNode( "//File" );
-
-            XmlElement element = doc.CreateElement( "Title" );
-            element.InnerText = fileInfo.Title;
-            root.AppendChild( element );
-            element = doc.CreateElement( "UploaderName" );
-            element.InnerText = fileInfo.UploaderName;
-            root.AppendChild( element );
-            element = doc.CreateElement( "Description" );
-            element.InnerText = fileInfo.Description;
-            root.AppendChild( element );
-
-            doc.Save( xmlTargetPath );
-        }
+        
 
         // POST api/values
         [HttpPost]
-        public string UploadFile( IFormFile file )
+        public Info UploadFile( IFormFile file )
         {
+            Info info = new Info();
             Random num = new Random( DateTime.Now.Millisecond );
             int count = num.Next();
             if ( file == null )
@@ -97,6 +76,7 @@ namespace TourOfHeroesBackend.Controllers
             string targetPath = System.IO.Path.Combine( dirPath, fileName );
             string xmlFileName = string.Format( @"File{0}{1}.xml", count, ext );
             string xmlTargetPath = System.IO.Path.Combine( dirPath, xmlFileName );
+            info.XmlFileName = xmlFileName;
 
             if ( !System.IO.File.Exists( targetPath ) )
             {
@@ -153,7 +133,31 @@ namespace TourOfHeroesBackend.Controllers
                 throw new Exception( "File already exists." );
             }
 
-            return xmlFileName;
+            return info;
+        }
+
+        [Route( "form" )]
+        [HttpPost]
+        public void UpdateXmlFile([FromBody] Info fileInfo )
+        {
+            string dirPath = @"C:\Users\eioannidis\source\repos\MyDatabase\";
+            string xmlTargetPath = System.IO.Path.Combine( dirPath, fileInfo.XmlFileName );
+            XmlDocument doc = new XmlDocument();
+            doc.Load( xmlTargetPath );
+
+            XmlNode root = doc.SelectSingleNode( "//File" );
+
+            XmlElement element = doc.CreateElement( "Title" );
+            element.InnerText = fileInfo.Title;
+            root.AppendChild( element );
+            element = doc.CreateElement( "UploaderName" );
+            element.InnerText = fileInfo.UploaderName;
+            root.AppendChild( element );
+            element = doc.CreateElement( "Description" );
+            element.InnerText = fileInfo.Description;
+            root.AppendChild( element );
+
+            doc.Save( xmlTargetPath );
         }
 
         // PUT api/values/5
