@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Heroes lang="en">
+  <Hero>
+    <id>1</id>
+    <name>Son Goku</name>
+    <power>Ki control, energy blasts, martial arts, teleportation and many more.</power>
+    <identity>Saiyan.</identity>
+  </Hero>
+  <Hero>
+    <id>2</id>
+    <name>Batman</name>
+    <power>Unbelievably rich.</power>
+    <identity>Bruce Wayne, billionaire.</identity>
+  </Hero>
+  <Hero>
+    <id>3</id>
+    <name>Superman</name>
+    <power>X-ray vision, super strenth, super speed, laser eyes and more.</power>
+    <identity>Clark Kent, alien from planet Krypton.</identity>
+  </Hero>
+  <Hero>
+    <id>4</id>
+    <name>Wonder Woman</name>
+    <power>Invulnerability, super strength, super senses, object (bullet) deflect.</power>
+    <identity>Amazon, daughter of Zeus.</identity>
+  </Hero>
+  <Hero>
+    <id>5</id>
+    <name>Deku</name>
+    <power>One for All</power>
+    <identity>Midoriya Izuku.</identity>
+  </Hero>
+  <Hero>
+    <id>6</id>
+    <name>Pacman</name>
+    <power>Eats candy and ghosts.</power>
+    <identity>You know who he is.</identity>
+  </Hero>
+  <Hero>
+    <id>7</id>
+    <name>Asta</name>
+    <power>No magic, 5 leaf grimoire, magic cutting and mana eating swords.</power>
+    <identity>Future Magic Emperor.</identity>
+  </Hero>
+  <Hero>
+    <id>8</id>
+    <name>Son Gohan</name>
+    <power>Ki blasts, martial arts expert.</power>
+    <identity>Saiyan.</identity>
+  </Hero>
+  <Hero>
+    <id>9</id>
+    <name>Juno</name>
+    <power>Unbelievable mana amount, 4 leaf clover grimoire.</power>
+    <identity>Asta's childhood friend and rival for future Magic Emperor position.</identity>
+  </Hero>
+  <Hero>
+    <id>10</id>
+    <name>Megaman</name>
+    <power>Canons on his hands.</power>
+    <identity> Just a robot kid.</identity>
+  </Hero>
+</Heroes>
