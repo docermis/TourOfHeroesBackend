@@ -2,21 +2,21 @@
 <Heroes lang="en">
   <Hero>
     <id>1</id>
-    <name>Son Goku</name>
-    <power>Ki control, energy blasts, martial arts, teleportation and many more.</power>
-    <identity>Saiyan.</identity>
-  </Hero>
-  <Hero>
-    <id>2</id>
     <name>Batman</name>
-    <power>Unbelievably rich.</power>
+    <power>Filthy Rich.</power>
     <identity>Bruce Wayne, billionaire.</identity>
   </Hero>
   <Hero>
+    <id>2</id>
+    <name>Son Goku</name>
+    <power>Ki blasts, martial arts expert, Super Saiyan.</power>
+    <identity>Saiyan from planet Vegeta.</identity>
+  </Hero>
+  <Hero>
     <id>3</id>
-    <name>Superman</name>
-    <power>X-ray vision, super strenth, super speed, laser eyes and more.</power>
-    <identity>Clark Kent, alien from planet Krypton.</identity>
+    <name>Pacman</name>
+    <power>Eats candy and ghosts.</power>
+    <identity>You know who he is.</identity>
   </Hero>
   <Hero>
     <id>4</id>
@@ -32,9 +32,9 @@
   </Hero>
   <Hero>
     <id>6</id>
-    <name>Pacman</name>
-    <power>Eats candy and ghosts.</power>
-    <identity>You know who he is.</identity>
+    <name>Superman</name>
+    <power>Super strength, super speed, laser eyes, super everything.</power>
+    <identity>Clark Kent, alien from Krypton.</identity>
   </Hero>
   <Hero>
     <id>7</id>
@@ -59,5 +59,17 @@
     <name>Megaman</name>
     <power>Canons for hands.</power>
     <identity>Just a simple robot boy.</identity>
+  </Hero>
+  <Hero>
+    <id>11</id>
+    <name>Yukihira Soma</name>
+    <power>Vast experience from working at his family's diner.</power>
+    <identity>92nd class Tootsuki academy High school first year student.</identity>
+  </Hero>
+  <Hero>
+    <id>12</id>
+    <name>All Might</name>
+    <power>One for All previous owner.</power>
+    <identity>Toshinori Yagi.</identity>
   </Hero>
 </Heroes>
