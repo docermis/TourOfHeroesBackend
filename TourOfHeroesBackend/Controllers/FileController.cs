@@ -15,9 +15,12 @@ using System.Xml.Serialization;
 
 namespace TourOfHeroesBackend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route( "api/[controller]" )]
     public class FileController : Controller
     {
+        string dirPath = @"C:\Users\eioannidis\source\repos\MyDatabase\";
+
+
         // GET: api/<controller>
         [HttpGet]
         public IEnumerable<string> Get()
@@ -25,25 +28,83 @@ namespace TourOfHeroesBackend.Controllers
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/file/term
-        [HttpGet("{searchTerm}")]
-        public string[] Get(string searchTerm)
+        //GET api/file/download/id
+        [HttpGet( "download/{id}" )]
+        public FileResult Get( int id )
         {
-            string[] fileNamesList = Directory.GetFiles( @"C:\Users\eioannidis\source\repos\MyDatabase\", "*" + searchTerm + "*" );
+            string targetFileName = "";
+            string targetRealFileName = "";
+            XmlDocument doc = new XmlDocument();
+            doc.Load( dirPath + "MyDatabaseData.xml" );
 
+            XmlNode databaseNode = doc.SelectSingleNode( "//Database" );
 
+            foreach ( XmlNode node in databaseNode )
+            {
+                if ( node.ChildNodes[0].InnerText == id.ToString() )
+                {
+                    targetFileName = node.ChildNodes[2].InnerText;
+                    targetRealFileName = node.ChildNodes[1].InnerText;
+                    break;
+                }
+            }
+            string filePath = System.IO.Path.Combine( dirPath, targetFileName );
 
-            return fileNamesList;
+            System.IO.FileStream fs = System.IO.File.OpenRead( filePath );
+            //BinaryReader br = new BinaryReader( fs );
+            //var fileContent = br.ReadBytes( (int) fs.Length );
+
+            return File( fs, System.Net.Mime.MediaTypeNames.Application.Octet, targetRealFileName );
+            // return File(fileContent, System.Net.Mime.MediaTypeNames.Application.Octet, targetRealFileName );
         }
-        
+
+        // GET api/file/term
+        [HttpGet( "{searchTerm}" )]
+        public IEnumerable<MyDatabaseData> Get( string searchTerm )
+        {
+            List<MyDatabaseData> fileDataList = new List<MyDatabaseData>();
+
+            XmlDocument doc = new XmlDocument();
+            doc.Load( dirPath + "MyDatabaseData.xml" );
+
+            XmlNode databaseNode = doc.SelectSingleNode( "//Database" );
+
+            foreach ( XmlNode node in databaseNode )
+            {
+                MyDatabaseData myDatabaseData = new MyDatabaseData();
+                if ( node.ChildNodes[1].InnerText.IndexOf( searchTerm, StringComparison.OrdinalIgnoreCase ) >= 0 )
+                {
+                    myDatabaseData.Id = Convert.ToInt32( node.ChildNodes[0].InnerText );
+                    myDatabaseData.OriginalFileName = node.ChildNodes[1].InnerText;
+                    myDatabaseData.MyFileName = node.ChildNodes[2].InnerText;
+                    fileDataList.Add( myDatabaseData );
+                }
+            }
+
+
+            //if ( !(searchTerm != null) )
+            //{
+            //    foreach ( XmlNode node in databaseNode )
+            //    {
+            //        MyDatabaseData myDatabaseData = new MyDatabaseData();
+            //        myDatabaseData.Id = Convert.ToInt32( node.ChildNodes[0].InnerText );
+            //        myDatabaseData.OriginalFileName = node.ChildNodes[1].InnerText;
+            //        myDatabaseData.MyFileName = node.ChildNodes[2].InnerText;
+            //        fileDataList.Add( myDatabaseData );
+            //    }
+            //}
+
+            return fileDataList;
+        }
+
 
         // POST api/file
         [HttpPost]
         public Info UploadFile( IFormFile file )
         {
             Info info = new Info();
-            Random num = new Random( DateTime.Now.Millisecond );
-            int count = num.Next();
+
+
             if ( file == null )
             {
                 throw new Exception( "File is null." );
@@ -52,19 +113,62 @@ namespace TourOfHeroesBackend.Controllers
             {
                 throw new Exception( "File is empty." );
             }
-            int period = file.FileName.IndexOf( "." );
-            string ext = file.FileName.Substring( period );
-            string dirPath = @"C:\Users\eioannidis\source\repos\MyDatabase\";
-            string fileName = string.Format( @"File{0}{1}", count, ext );    //file.FileName;    //tha tou dinw egw unique name gia twra pou den iparxei vasi.
+
+            string ext = "";
+            foreach ( char c in file.FileName )
+            {
+                if ( c.Equals( '.' ) )
+                {
+                    ext = ".";
+                }
+                else
+                {
+                    ext += c;
+                }
+
+            }
+
+            XmlDocument doc = new XmlDocument();
+            doc.Load( dirPath + "MyDatabaseData.xml" );
+            int id;
+            int count = 1;
+
+            XmlNode databaseNode = doc.SelectSingleNode( "//Database" );
+            foreach ( XmlNode temp in databaseNode )
+            {
+                if ( count < Convert.ToInt32( temp.ChildNodes[0].InnerText ) )
+                {
+                    break;
+                }
+                count++;
+            }
+            id = count;
+
+            string fileName = string.Format( @"File{0}{1}", id, ext );      //tha tou dinw egw unique name gia twra pou den iparxei vasi.
             string targetPath = System.IO.Path.Combine( dirPath, fileName );
-            string xmlFileName = string.Format( @"File{0}{1}.xml", count, ext );
+            string xmlFileName = string.Format( @"File{0}{1}.xml", id, ext );
             string xmlTargetPath = System.IO.Path.Combine( dirPath, xmlFileName );
             info.XmlFileName = xmlFileName;
 
             if ( !System.IO.File.Exists( targetPath ) )
             {
 
-                //na tsekarw an uparxei idi to arxeio
+                XmlNode fileNode = doc.CreateElement( "File" );
+                databaseNode.AppendChild( fileNode );
+
+                XmlNode node = doc.CreateElement( "Id" );
+                node.InnerText = id.ToString();
+                fileNode.AppendChild( node );
+                node = doc.CreateElement( "OriginalName" );
+                node.InnerText = file.FileName;
+                fileNode.AppendChild( node );
+                node = doc.CreateElement( "MyName" );
+                node.InnerText = fileName;
+                fileNode.AppendChild( node );
+
+                doc.Save( dirPath + "MyDatabaseData.xml" );
+
+
                 using ( Stream stream = file.OpenReadStream() )
                 using ( Stream targetStream = System.IO.File.OpenWrite( targetPath ) )
                 {
@@ -81,7 +185,7 @@ namespace TourOfHeroesBackend.Controllers
                     using ( FileStream fs = System.IO.File.Create( xmlTargetPath ) )
                     {
 
-                        XmlDocument doc = new XmlDocument();
+                        doc = new XmlDocument();
 
                         //Create an XML declaration. 
                         XmlDeclaration xmldecl = doc.CreateXmlDeclaration( "1.0", "utf-8", null );
@@ -93,7 +197,7 @@ namespace TourOfHeroesBackend.Controllers
                         doc.InsertBefore( xmldecl, root );
 
                         //Create node for origianl name, my name, creation date and append it to root
-                        XmlNode node = doc.CreateElement( "OriginalName" );
+                        node = doc.CreateElement( "OriginalName" );
                         node.InnerText = file.FileName;
                         root.AppendChild( node );
                         node = doc.CreateElement( "MyName" );
@@ -120,15 +224,40 @@ namespace TourOfHeroesBackend.Controllers
         }
 
         // PUT api/<controller>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        [HttpPut( "{id}" )]
+        public void Put( int id, [FromBody]string value )
         {
         }
 
-        // DELETE api/<controller>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // DELETE api/file/
+        [HttpDelete( "{id}" )]
+        public void Delete( int id )
         {
+            MyDatabaseData myDatabaseData = new MyDatabaseData();
+            XmlDocument doc = new XmlDocument();
+            doc.Load( dirPath + "MyDatabaseData.xml" );
+            XmlNode root = doc.SelectSingleNode( "//Database" );
+
+            foreach ( XmlNode node in root )
+            {
+                if ( Convert.ToInt32( node.ChildNodes[0].InnerText ) == id )
+                {
+                    myDatabaseData.Id = Convert.ToInt32( node.ChildNodes[0].InnerText );
+                    myDatabaseData.OriginalFileName = node.ChildNodes[1].InnerText;
+                    myDatabaseData.MyFileName = node.ChildNodes[2].InnerText;
+                    node.RemoveAll();
+                    root.RemoveChild( node );
+                    break;
+                }
+            }
+            doc.Save( dirPath + "MyDatabaseData.xml" );
+
+            string targetFilePath = System.IO.Path.Combine( dirPath, myDatabaseData.MyFileName );
+            string targetXmlFilePath = System.IO.Path.Combine( dirPath, string.Format( @"{0}.xml", myDatabaseData.MyFileName ) );
+
+            System.IO.File.Delete( targetFilePath );
+            System.IO.File.Delete( targetXmlFilePath );
+
         }
     }
 }

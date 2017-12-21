@@ -107,8 +107,7 @@ namespace TourOfHeroesBackend.Controllers
 
 
             XmlNode heroesNode = doc.SelectSingleNode( "//Heroes" );
-
-            foreach ( XmlNode nodeSearch in doc.SelectNodes( "//Heroes/Hero" ) )
+            foreach ( XmlNode nodeSearch in heroesNode )
             {
                 if ( Convert.ToInt32( nodeSearch.ChildNodes[0].InnerText ) > count )
                 {

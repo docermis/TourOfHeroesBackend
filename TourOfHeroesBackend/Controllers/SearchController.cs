@@ -19,6 +19,7 @@ namespace TourOfHeroesBackend.Controllers
     public class SearchController : Controller
     {
         string database = "HeroDatabase.xml";
+        string dirPath = @"C:\Users\eioannidis\source\repos\MyDatabase\";
 
         // GET: api/search
         [HttpGet]
@@ -56,7 +57,7 @@ namespace TourOfHeroesBackend.Controllers
         [HttpPost]
         public void UpdateXmlFile([FromBody] Info fileInfo )
         {
-            string dirPath = @"C:\Users\eioannidis\source\repos\MyDatabase\";
+            
             string xmlTargetPath = System.IO.Path.Combine( dirPath, fileInfo.XmlFileName );
             XmlDocument doc = new XmlDocument();
             doc.Load( xmlTargetPath );
