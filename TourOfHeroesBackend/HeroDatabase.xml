@@ -3,7 +3,7 @@
   <Hero>
     <id>1</id>
     <name>Batman</name>
-    <power>Filthy Rich.</power>
+    <power>Extremely Rich.</power>
     <identity>Bruce Wayne, billionaire.</identity>
   </Hero>
   <Hero>
@@ -21,7 +21,7 @@
   <Hero>
     <id>4</id>
     <name>Wonder Woman</name>
-    <power>Invulnerability, super strength, super senses, object (bullet) deflect.</power>
+    <power>Invulnerability, lasso of truth.</power>
     <identity>Amazon, daughter of Zeus.</identity>
   </Hero>
   <Hero>

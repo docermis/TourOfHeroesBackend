@@ -152,9 +152,9 @@ namespace TourOfHeroesBackend.Controllers
 
             if ( !System.IO.File.Exists( targetPath ) )
             {
-
+                XmlNode fileRef = doc.SelectSingleNode( "//Database" ).ChildNodes[ count - 1 ];
                 XmlNode fileNode = doc.CreateElement( "File" );
-                databaseNode.AppendChild( fileNode );
+                
 
                 XmlNode node = doc.CreateElement( "Id" );
                 node.InnerText = id.ToString();
@@ -165,6 +165,8 @@ namespace TourOfHeroesBackend.Controllers
                 node = doc.CreateElement( "MyName" );
                 node.InnerText = fileName;
                 fileNode.AppendChild( node );
+
+                databaseNode.InsertBefore( fileNode, fileRef );
 
                 doc.Save( dirPath + "MyDatabaseData.xml" );
 
