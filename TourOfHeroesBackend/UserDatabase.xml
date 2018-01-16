@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Users lang="en">
+  <User>
+    <id>1</id>
+    <firstName>Bruce</firstName>
+    <lastName>Wayne</lastName>
+    <username>Batman</username>
+    <password>iAmBatman</password>
+  </User>
+  <User>
+    <id>2</id>
+    <firstName>Clark</firstName>
+    <lastName>Kent</lastName>
+    <username>Superman</username>
+    <password>iAmSuperman</password>
+  </User>
+  <User>
+    <id>3</id>
+    <firstName>Diana</firstName>
+    <lastName>Prince</lastName>
+    <username>WonderWoman</username>
+    <password>iAmWonderWoman</password>
+  </User>
+  <User>
+    <id>4</id>
+    <firstName>Negi</firstName>
+    <lastName>Springfield</lastName>
+    <username>Boya</username>
+    <password>iAmBoya</password>
+  </User>
+</Users>

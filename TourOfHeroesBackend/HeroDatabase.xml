@@ -72,4 +72,16 @@
     <power>One for All previous owner.</power>
     <identity>Toshinori Yagi.</identity>
   </Hero>
+  <Hero>
+    <id>13</id>
+    <name>One Punch Man</name>
+    <power>Kills anyone with one punch.</power>
+    <identity>Saitama</identity>
+  </Hero>
+  <Hero>
+    <id>14</id>
+    <name>Negi</name>
+    <power>Magician</power>
+    <identity>Magi-Sensei</identity>
+  </Hero>
 </Heroes>

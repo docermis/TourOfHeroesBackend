@@ -17,7 +17,6 @@ namespace TourOfHeroesBackend.Controllers
         string database = "HeroDatabase.xml";
 
         // GET api/values
-        //Get all heroes
         [HttpGet]
         public IEnumerable<Hero> Get()
         {
