@@ -21,12 +21,7 @@ namespace TourOfHeroesBackend.Controllers
         string database = "HeroDatabase.xml";
         string dirPath = @"C:\Users\eioannidis\source\repos\MyDatabase\";
 
-        // GET: api/search
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
+        
 
         // GET api/search/superman
         [HttpGet( "{term}" )]
@@ -67,8 +62,11 @@ namespace TourOfHeroesBackend.Controllers
             XmlElement element = doc.CreateElement( "Title" );
             element.InnerText = fileInfo.Title;
             root.AppendChild( element );
+            element = doc.CreateElement( "UploaderUsername" );
+            element.InnerText = fileInfo.UploaderInfo.Username;
+            root.AppendChild( element );
             element = doc.CreateElement( "UploaderName" );
-            element.InnerText = fileInfo.UploaderName;
+            element.InnerText = fileInfo.UploaderInfo.FirstName + " " + fileInfo.UploaderInfo.LastName;
             root.AppendChild( element );
             element = doc.CreateElement( "Description" );
             element.InnerText = fileInfo.Description;
@@ -77,16 +75,6 @@ namespace TourOfHeroesBackend.Controllers
             doc.Save( xmlTargetPath );
         }
 
-        // PUT api/values/5
-        [HttpPut( "{id}" )]
-        public void Put( int id, [FromBody]string value )
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete( "{id}" )]
-        public void Delete( int id )
-        {
-        }
+        
     }
 }

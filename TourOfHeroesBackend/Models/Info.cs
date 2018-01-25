@@ -10,7 +10,7 @@ namespace TourOfHeroesBackend.Models
         public string OriginalFileName { get; set; }
         public string XmlFileName { get; set; }
         public string Title { get; set; }
-        public string UploaderName { get; set; }
+        public UserDto UploaderInfo { get; set; }
         public string Description { get; set; }
     }
 }

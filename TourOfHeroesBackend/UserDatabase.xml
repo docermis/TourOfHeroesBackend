@@ -28,4 +28,39 @@
     <username>Boya</username>
     <password>iAmBoya</password>
   </User>
+  <User>
+    <id>5</id>
+    <firstName>Ermis</firstName>
+    <lastName>Ioannidis</lastName>
+    <username>eioannidis</username>
+    <password>eioannidis</password>
+  </User>
+  <User>
+    <id>6</id>
+    <firstName>Giannis</firstName>
+    <lastName>Kalyvas</lastName>
+    <username>ikalyvas</username>
+    <password>eioannidis</password>
+  </User>
+  <User>
+    <id>7</id>
+    <firstName>Anna</firstName>
+    <lastName>Bakouli</lastName>
+    <username>abakouli</username>
+    <password>abakouli</password>
+  </User>
+  <User>
+    <id>8</id>
+    <firstName>Giorgos</firstName>
+    <lastName>Papanikos</lastName>
+    <username>gpapanikos</username>
+    <password>gpapanikos</password>
+  </User>
+  <User>
+    <id>9</id>
+    <firstName>User</firstName>
+    <lastName>Name</lastName>
+    <username>username</username>
+    <password>password</password>
+  </User>
 </Users>

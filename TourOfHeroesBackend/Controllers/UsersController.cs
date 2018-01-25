@@ -1,23 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TourOfHeroesBackend.Models;
-using System.IO;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using System.Xml.Serialization;
+using System.Xml;
+using TourOfHeroesBackend.Models;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace TourOfHeroesBackend.Controllers
 {
+    [Authorize]
     [Route( "api/[controller]" )]
     public class UsersController : Controller
     {
         string database = "UserDatabase.xml";
+        //private IConfiguration _config;
+
+        //public UsersController( IConfiguration config )
+        //{
+        //    _config = config;
+        //}
+
+        private Jwt _config;
+        public UsersController( IOptions<Jwt> jwt )
+        {
+            _config = jwt.Value;
+            // _settings.StringSetting == "My Value";
+        }
+
+
 
         // GET: api/<controller>
         [HttpGet]
@@ -46,12 +63,54 @@ namespace TourOfHeroesBackend.Controllers
 
         // GET api/<controller>/5
         [HttpGet( "{id}" )]
-        public string Get( int id )
+        public UserDto Get( int id )
         {
-            return "value";
+            UserDto userDto = new UserDto();
+            XmlDocument doc = new XmlDocument();
+
+            doc.Load( database );
+
+            foreach ( XmlNode node in doc.SelectNodes( "//Users/User" ) )
+            {
+                if ( Convert.ToInt32( node.ChildNodes[0].InnerText ) == id )
+                {
+                    userDto.Id = Convert.ToInt32( node.ChildNodes[0].InnerText );
+                    userDto.FirstName = node.ChildNodes[1].InnerText;
+                    userDto.LastName = node.ChildNodes[2].InnerText;
+                    userDto.Username = node.ChildNodes[3].InnerText;
+                }
+            }
+
+            return userDto;
+        }
+
+        [HttpGet( "search/{term}" )]
+        public IEnumerable<UserDto> Get( string term )
+        {
+            List<UserDto> userDtoList = new List<UserDto>();
+            XmlDocument doc = new XmlDocument();
+
+            doc.Load( database );
+
+            foreach ( XmlNode node in doc.SelectNodes( "//Users/User" ) )
+            {
+                UserDto userDto = new UserDto();
+                if ( node.ChildNodes[1].InnerText.IndexOf( term, StringComparison.OrdinalIgnoreCase ) >= 0 ||
+                    node.ChildNodes[2].InnerText.IndexOf( term, StringComparison.OrdinalIgnoreCase ) >= 0 )
+                {
+                    userDto.Id = Convert.ToInt32( node.ChildNodes[0].InnerText );
+                    userDto.FirstName = node.ChildNodes[1].InnerText;
+                    userDto.LastName = node.ChildNodes[2].InnerText;
+                    userDto.Username = node.ChildNodes[3].InnerText;
+                    userDtoList.Add( userDto );
+                }
+            }
+
+            return userDtoList;
         }
 
         // POST api/<controller>/register
+        [AllowAnonymous]
         [HttpPost( "register" )]
         public UserDto Post( [FromBody]UserDto user )
         {
@@ -72,6 +131,7 @@ namespace TourOfHeroesBackend.Controllers
                 count++;
             }
             id = count;
+            user.Id = id;
 
             XmlNode userRef = doc.SelectSingleNode( "//Users" ).ChildNodes[count - 1];
 
@@ -81,7 +141,6 @@ namespace TourOfHeroesBackend.Controllers
             XmlNode node = doc.CreateElement( "id" );
             node.InnerText = ( id ).ToString();
             userNode.AppendChild( node );
-            user.Id = id;
 
             node = doc.CreateElement( "firstName" );
             node.InnerText = user.FirstName;
@@ -106,76 +165,111 @@ namespace TourOfHeroesBackend.Controllers
             return user;
         }
 
+        [AllowAnonymous]
         [HttpPost( "authenticate" )]
-        public string Authenticate( [FromBody] string username, string password )
+        public IActionResult Authenticate( [FromBody] UserCredentials userCredentials )
         {
+            if ( string.IsNullOrEmpty( userCredentials.Username ) || string.IsNullOrEmpty( userCredentials.Password ) )
+                return Unauthorized();
 
+            UserDto userDto = new UserDto
+            {
+                Id = 0
+            };
+            XmlDocument doc = new XmlDocument();
 
-            return username;
+            doc.Load( database );
+
+            foreach ( XmlNode node in doc.SelectNodes( "//Users/User" ) )
+            {
+                if ( node.ChildNodes[3].InnerText == userCredentials.Username )
+                {
+                    if ( node.ChildNodes[4].InnerText == userCredentials.Password )
+                    {
+                        //create and return user and token
+                        userDto.Id = Convert.ToInt32( node.ChildNodes[0].InnerText );
+                        userDto.FirstName = node.ChildNodes[1].InnerText;
+                        userDto.LastName = node.ChildNodes[2].InnerText;
+                        break;
+                    }
+                }
+            }
+
+            // an den vreis user me to username tote epestrepse oti den uparxei.    
+            if ( userDto.Id == 0 )
+            {
+                return Unauthorized();
+            }
+
+            var key = new SymmetricSecurityKey( Encoding.UTF8.GetBytes( _config.Key ) );
+            var creds = new SigningCredentials( key, SecurityAlgorithms.HmacSha256 );
+
+            var token = new JwtSecurityToken(
+                _config.Issuer,
+                _config.Audience,
+                expires: DateTime.Now.AddMinutes( 30 ),
+                signingCredentials: creds
+                );
+            
+            var tokenString = new JwtSecurityTokenHandler().WriteToken( token );
+            //grapse se xml to username kai to token tou xristi pou ekane log in
+
+            return Ok( new
+            {
+                Id = userDto.Id,
+                FirstName = userDto.FirstName,
+                LastName = userDto.LastName,
+                Username = userCredentials.Username,
+                Token = tokenString
+            } );
         }
 
 
-        // POST api/<controller>
-        //[AllowAnonymous]
-        //[HttpPost]
-        //public IActionResult Register( [FromBody]UserDto userDto )
-        //{
-        //    // map dto to entity
-        //    var user = _mapper.Map<User>( userDto );
 
-        //    try
-        //    {
-        //        // save 
-        //        _userService.Create( user, userDto.Password );
-        //        return Ok();
-        //    }
-        //    catch ( AppException ex )
-        //    {
-        //        // return error message if there was an exception
-        //        return BadRequest( ex.Message );
-        //    }
-
-        //    public User Create( User user, string password )
-        //    {
-        //        // validation
-        //        if ( string.IsNullOrWhiteSpace( password ) )
-        //            throw new AppException( "Password is required" );
-
-        //        if ( _context.Users.Any( x => x.Username == user.Username ) )
-        //            throw new AppException( "Username " + user.Username + " is already taken" );
-
-        //        byte[] passwordHash, passwordSalt;
-        //        if ( password == null ) throw new ArgumentNullException( "password" );
-        //        if ( string.IsNullOrWhiteSpace( password ) ) throw new ArgumentException( "Value cannot be empty or whitespace only string.", "password" );
-
-        //        using ( var hmac = new System.Security.Cryptography.HMACSHA512() )
-        //        {
-        //            passwordSalt = hmac.Key;
-        //            passwordHash = hmac.ComputeHash( System.Text.Encoding.UTF8.GetBytes( password ) );
-        //        }
-
-        //        user.PasswordHash = passwordHash;
-        //        user.PasswordSalt = passwordSalt;
-
-        //        _context.Users.Add( user );
-        //        _context.SaveChanges();
-
-        //        return user;
-        //    }
-
-
-        //}
 
         // PUT api/<controller>/5
         [HttpPut( "{id}" )]
-        public void Put( int id, [FromBody]string value )
+        public void Put( int id, [FromBody]UserDto userDto )
         {
+            XmlDocument doc = new XmlDocument();
+            doc.Load( database );
+
+            foreach ( XmlNode node in doc.SelectNodes( "//Users/User" ) )
+            {
+                if ( id == Convert.ToInt32( node.ChildNodes[0].InnerText ) )
+                {
+                    node.ChildNodes[0].InnerText = userDto.Id.ToString();
+                    node.ChildNodes[1].InnerText = userDto.FirstName;
+                    node.ChildNodes[2].InnerText = userDto.LastName;
+                    node.ChildNodes[3].InnerText = userDto.Username;
+                    node.ChildNodes[4].InnerText = userDto.Password;
+                    break;
+                }
+            }
+
+            doc.Save( database );
         }
 
         // DELETE api/<controller>/5
         [HttpDelete( "{id}" )]
         public void Delete( int id )
         {
+            XmlDocument doc = new XmlDocument();
+            doc.Load( database );
+
+            XmlNode parent = doc.SelectSingleNode( "//Users" );
+
+
+            foreach ( XmlNode node in parent.ChildNodes )
+            {
+                if ( id == Convert.ToInt32( node.ChildNodes[0].InnerText ) )
+                {
+                    node.RemoveAll();
+                    parent.RemoveChild( node );
+                    break;
+                }
+            }
+            doc.Save( database );
         }
     }
 }
